@@ -1,3 +1,4 @@
+const bluebird = require('bluebird');
 const dotenv = require('dotenv')
 const express = require('express');
 const path = require('path');
@@ -5,6 +6,7 @@ const favicon = require('serve-favicon');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const index = require('./routes/index');
 const users = require('./routes/users');
@@ -25,6 +27,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// connect to mongo
+mongoose.Promise = bluebird;
+mongoose.connect(process.env.MONGO_URL)
+  .then(() => {
+    console.log('Successfully connected to mongo instance');
+  })
+  .catch(() => {
+    console.error('Error connecting to mongo instance');
+  })
 
 app.use('/', index);
 app.use('/users', users);
